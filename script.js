@@ -166,7 +166,7 @@ function scoreEmail() {
     makeScoreItem('変更前の日程を適切に示している', 10, Math.min(10, oldDatePoints), '変更前の日時を具体的に示せています。', '変更前の9月18日（金）14:00を、できるだけ具体的に書きましょう。'),
     makeScoreItem('候補日時を適切に提示している', 15, candidatePoints, `${candidateDateCount}件の日付と${candidateTimeCount}件の時刻を確認できました。`, '候補日時は日付と時刻をセットにして、複数提示しましょう。'),
     makeScoreItem('相手への配慮・お詫びの表現がある', 10, Math.min(10, considerationPoints), 'お詫びや相手への負担に配慮した表現があります。', '「申し訳ございません」「お手数をおかけします」などを加えましょう。'),
-    makeScoreItem('結びの言葉が適切', 5, Math.min(5, closingPoints), '「よろしく」などの結びを確認できました。', '文末に「よろしく」などの丁寧な結びを入れましょう。')
+    makeScoreItem('結びの言葉が適切', 5, Math.min(5, closingPoints), '「よろしくお願いいたします」などの結びを確認できました。', '文末に「よろしくお願いいたします」などの丁寧な結びを入れましょう。')
   ];
 
   return {
