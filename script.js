@@ -106,56 +106,67 @@ function includesAny(text, patterns) {
   return patterns.some((pattern) => text.includes(pattern));
 }
 
+function countMatches(text, patterns) {
+  return patterns.filter((pattern) => text.includes(pattern)).length;
+}
+
+function makeScoreItem(title, max, points, good, bad) {
+  return { title, max, points, comment: points > 0 ? good : bad };
+}
+
 function scoreEmail() {
   const subject = subjectInput.value.trim();
   const body = bodyInput.value.trim();
   const allText = `${subject}\n${body}`;
-  const hasCandidates = ['9月19日', '9月21日', '9月22日'].filter((date) => body.includes(date)).length;
+  const greetingPatterns = ['お世話になっております', 'いつもお世話になっております', 'お疲れさまです', 'お疲れ様です'];
+  const meetingPatterns = ['打ち合わせ', '打合せ', '商談', '会議', 'ミーティング', '面談'];
+  const changePatterns = ['日程変更', '日時変更', '日程の変更', '変更', '延期', '再調整', '別日'];
+  const requestPatterns = ['お願い', '可能でしょうか', 'いただけますでしょうか', 'ご相談', 'ご都合'];
+  const hasGreeting = includesAny(body, greetingPatterns);
+  const greetingAtStart = greetingPatterns.some((pattern) => body.startsWith(pattern));
+  const candidateDates = ['9月19日', '9月21日', '9月22日'];
+  const candidateDateCount = candidateDates.filter((date) => body.includes(date)).length;
+  const candidateTimeCount = ['10:00', '13:00', '15:00'].filter((time) => body.includes(time)).length;
+  const subjectPoints = Math.min(20,
+    (subject.length >= 5 ? 3 : subject.length >= 3 ? 1 : 0)
+      + (includesAny(subject, meetingPatterns) ? 5 : 0)
+      + (includesAny(subject, changePatterns) ? 6 : 0)
+      + (includesAny(subject, requestPatterns) ? 4 : 0)
+      + (/[0-9０-９]+月|[0-9０-９]+時/.test(subject) ? 2 : 0));
+  const greetingPoints = (greetingAtStart ? 6 : hasGreeting ? 4 : 0)
+    + (hasGreeting && includesAny(body, ['おります', 'です']) ? 4 : 0);
+  const companyMentioned = includesAny(body, ['株式会社ルミナス', 'ルミナス']);
+  const nameIntroduced = includesAny(body, ['〇〇です', '○○です', 'です。', 'と申します', '申します。']);
+  const affiliationPoints = (companyMentioned ? 6 : 0) + (nameIntroduced ? 5 : 0)
+    + (companyMentioned && nameIntroduced ? 4 : 0);
+  const changeIntentPoints = (includesAny(allText, changePatterns) ? 5 : 0)
+    + (includesAny(body, ['社内の都合', '都合により', '難しく', '予定して', 'できなく']) ? 3 : 0)
+    + (includesAny(body, requestPatterns) ? 4 : 0)
+    + (includesAny(body, ['変更させて', '変更したく', '変更をお願い', '延期させて']) ? 3 : 0);
+  const oldDatePoints = (body.includes('9月18日') ? 4 : 0)
+    + (includesAny(body, ['金曜', '金）', '金曜日']) ? 2 : 0)
+    + (body.includes('14:00') || body.includes('14時') ? 3 : 0)
+    + (includesAny(body, ['予定', '変更前', '打ち合わせ']) ? 1 : 0);
+  const candidatePoints = Math.min(15, candidateDateCount * 3 + candidateTimeCount + (candidateDateCount >= 1 && includesAny(body, requestPatterns) ? 3 : 0));
+  const considerationPoints = (includesAny(body, ['申し訳', '恐縮', 'お詫び', 'おわび']) ? 4 : 0)
+    + (includesAny(body, ['お手数', 'ご迷惑', 'ご負担', '恐れ入ります']) ? 3 : 0)
+    + (includesAny(body, ['社内の都合', '難しくなって', '急なお願い', '勝手を申し']) ? 3 : 0);
+  const closingPoints = (body.includes('よろしく') ? 3 : 0)
+    + (includesAny(body, ['幸いです', 'お知らせいただけますと', 'ご連絡ください']) ? 1 : 0)
+    + (/(よろしく|幸いです|ご連絡ください)[。！!]?\s*$/.test(body) ? 1 : 0);
   const items = [
-    {
-      title: '件名が具体的で、内容が分かる', max: 20,
-      earned: subject.length >= 5 && includesAny(subject, ['日程', '打ち合わせ', '変更']),
-      good: '用件が伝わる具体的な件名です。', bad: '「打ち合わせ」「日程」「変更」など、用件が分かる言葉を入れましょう。'
-    },
-    {
-      title: '適切な挨拶がある', max: 10,
-      earned: includesAny(body, ['お世話になっております', 'いつもお世話になっております', 'お疲れさまです']),
-      good: '丁寧な挨拶から始められています。', bad: '「お世話になっております」などの挨拶を入れましょう。'
-    },
-    {
-      title: '自分の所属・名前を名乗っている', max: 15,
-      earned: (body.includes('株式会社ルミナス') || body.includes('ルミナス')) && includesAny(body, ['です', 'と申します']),
-      good: '所属と名前を名乗れています。', bad: '会社名と自分の名前を名乗る一文を入れましょう。'
-    },
-    {
-      title: '日程変更をお願いする意図が明確', max: 15,
-      earned: includesAny(allText, ['変更', '延期', '別日', '日程を改め']),
-      good: '日程変更の意図が伝わります。', bad: '日程を変更したいという意図を明確に書きましょう。'
-    },
-    {
-      title: '変更前の日程を適切に示している', max: 10,
-      earned: body.includes('9月18日') && body.includes('14:00'),
-      good: '変更前の日時を具体的に示せています。', bad: '変更前の「9月18日（金）14:00」を本文に入れましょう。'
-    },
-    {
-      title: '候補日時を適切に提示している', max: 15,
-      earned: hasCandidates >= 2,
-      good: `${hasCandidates}件の候補日時を提示できています。`, bad: '候補日時を2件以上、具体的に提示しましょう。'
-    },
-    {
-      title: '相手への配慮・お詫びの表現がある', max: 10,
-      earned: includesAny(body, ['申し訳', '恐縮', 'お手数', 'ご迷惑']),
-      good: '相手への配慮が伝わる表現です。', bad: '「申し訳ございません」「お手数をおかけします」などを入れましょう。'
-    },
-    {
-      title: '結びの言葉が適切', max: 5,
-      earned: includesAny(body, ['よろしく', '幸いです', 'お知らせいただけますと']),
-      good: '丁寧な結びで締めくくれています。', bad: '最後に「よろしくお願いいたします」などの結びを入れましょう。'
-    }
+    makeScoreItem('件名が具体的で、内容が分かる', 20, subjectPoints, '用件を示す要素を複数含んだ件名です。', '件名に打ち合わせ・日程変更・お願いなど、用件が分かる要素を入れましょう。'),
+    makeScoreItem('適切な挨拶がある', 10, Math.min(10, greetingPoints), '丁寧な挨拶を適切な位置に入れられています。', '本文の冒頭に「お世話になっております」などの挨拶を入れましょう。'),
+    makeScoreItem('自分の所属・名前を名乗っている', 15, Math.min(15, affiliationPoints), '所属と名前を名乗る要素が確認できました。', '会社名と自分の名前を「です」「と申します」などで伝えましょう。'),
+    makeScoreItem('日程変更をお願いする意図が明確', 15, Math.min(15, changeIntentPoints), '変更理由と依頼の意図が文章から読み取れます。', '変更したい理由と、相手にお願いしたい内容を具体的に書きましょう。'),
+    makeScoreItem('変更前の日程を適切に示している', 10, Math.min(10, oldDatePoints), '変更前の日時を具体的に示せています。', '変更前の9月18日（金）14:00を、できるだけ具体的に書きましょう。'),
+    makeScoreItem('候補日時を適切に提示している', 15, candidatePoints, `${candidateDateCount}件の日付と${candidateTimeCount}件の時刻を確認できました。`, '候補日時は日付と時刻をセットにして、複数提示しましょう。'),
+    makeScoreItem('相手への配慮・お詫びの表現がある', 10, Math.min(10, considerationPoints), 'お詫びや相手への負担に配慮した表現があります。', '「申し訳ございません」「お手数をおかけします」などを加えましょう。'),
+    makeScoreItem('結びの言葉が適切', 5, Math.min(5, closingPoints), '「よろしく」などの結びを確認できました。', '文末に「よろしく」などの丁寧な結びを入れましょう。')
   ];
 
   return {
-    total: items.reduce((total, item) => total + (item.earned ? item.max : 0), 0),
-    items: items.map((item) => ({ ...item, points: item.earned ? item.max : 0, comment: item.earned ? item.good : item.bad }))
+    total: items.reduce((total, item) => total + item.points, 0),
+    items
   };
 }
