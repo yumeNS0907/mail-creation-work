@@ -1,5 +1,5 @@
 // Google Apps ScriptのWebアプリURLと管理者キーを設定します。
-const ADMIN_ENDPOINT = '';
+const ADMIN_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxDSZzuVekQ8qhJqwNFa0DhKvC4QCzMPcPQFG7F8e6sUaCIgUZ-LzX2anQ_hTZ_3haA/exec';
 const ADMIN_KEY = 'change-this-key';
 const responseList = document.getElementById('responseList');
 const adminStatus = document.getElementById('adminStatus');

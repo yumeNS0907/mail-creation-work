@@ -11,7 +11,7 @@ const resultsSection = document.getElementById('resultsSection');
 const progressSteps = document.querySelectorAll('.progress-step');
 
 // Google Apps ScriptのWebアプリURLを設定すると、提出内容がスプレッドシートへ保存されます。
-const SUBMISSION_ENDPOINT = '';
+const SUBMISSION_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxDSZzuVekQ8qhJqwNFa0DhKvC4QCzMPcPQFG7F8e6sUaCIgUZ-LzX2anQ_hTZ_3haA/exec';
 
 // 入力中の本文文字数を更新します。
 bodyInput.addEventListener('input', () => {
