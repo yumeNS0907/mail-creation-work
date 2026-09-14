@@ -92,6 +92,17 @@ dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .score-item-head { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; font-weight: 700; }
 .score-points { color: var(--teal); white-space: nowrap; }
 .score-comment { margin: 4px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.feedback-card { margin-top: 18px; padding: 16px; background: var(--pale); border: 1px solid var(--line); border-radius: 10px; }
+.feedback-heading { display: flex; align-items: center; gap: 9px; }
+.feedback-heading h3 { margin: 2px 0 0; font-size: 16px; }
+.feedback-icon { width: 25px; height: 25px; display: grid; place-items: center; color: #fff; background: var(--coral); border-radius: 50%; font-weight: 700; }
+.feedback-intro { margin: 9px 0 10px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.feedback-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.feedback-list li { padding: 10px 11px; background: #fff; border-left: 3px solid var(--coral); border-radius: 6px; font-size: 13px; line-height: 1.6; }
+.feedback-list li strong, .feedback-list li span { display: block; }
+.feedback-list li strong { color: var(--ink); }
+.feedback-list li span { color: var(--muted); }
+.feedback-list .feedback-complete { color: var(--teal); border-left-color: var(--teal); }
 .model-answer, .tips-section { margin-top: 34px; }
 .compact-heading { margin-bottom: 14px; }
 .compact-heading h2 { font-size: 19px; }

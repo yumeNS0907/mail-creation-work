@@ -44,6 +44,10 @@ document.getElementById('submitButton').addEventListener('click', () => {
       <p class="score-comment">${item.comment}</p>
     </div>
   `).join('');
+  const missingItems = result.items.filter((item) => item.points < item.max);
+  document.getElementById('feedbackList').innerHTML = missingItems.length > 0
+    ? missingItems.map((item) => `<li><strong>${item.title}</strong><span>あと${item.max - item.points}点分：${item.gap}</span></li>`).join('')
+    : '<li class="feedback-complete">すべての評価項目を満たしています。今回の学びを次のメール作成にも活かしましょう。</li>';
   reviewSection.classList.add('hidden');
   resultsSection.classList.remove('hidden');
   setStep(4);
@@ -111,7 +115,7 @@ function countMatches(text, patterns) {
 }
 
 function makeScoreItem(title, max, points, good, bad) {
-  return { title, max, points, comment: points > 0 ? good : bad };
+  return { title, max, points, comment: points > 0 ? good : bad, gap: bad };
 }
 
 function scoreEmail() {
