@@ -71,11 +71,6 @@
       <p class="section-note">相手に伝わりやすく、丁寧な文章を自由に考えてみましょう。</p>
       <form id="emailForm" novalidate>
         <div class="field-group">
-          <label for="recipient">宛先 <span class="required">必須</span></label>
-          <textarea id="recipient" rows="2" placeholder=""></textarea>
-          <p class="field-error" id="recipientError"></p>
-        </div>
-        <div class="field-group">
           <label for="subject">件名 <span class="required">必須</span></label>
           <input id="subject" type="text" placeholder="打ち合わせ日程変更のお願い">
           <p class="field-error" id="subjectError"></p>
@@ -103,7 +98,6 @@
       <div class="mail-preview">
         <div class="mail-toolbar"><span class="mail-dot"></span><span class="mail-dot"></span><span class="mail-dot"></span><span class="mail-label">メールプレビュー</span></div>
         <dl class="mail-meta">
-          <div><dt>宛先</dt><dd id="previewRecipient"></dd></div>
           <div><dt>件名</dt><dd id="previewSubject"></dd></div>
         </dl>
         <div class="mail-body" id="previewBody"></div>

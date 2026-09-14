@@ -1,6 +1,5 @@
 // メール作成ワークの画面操作と自動採点をまとめています。
 const form = document.getElementById('emailForm');
-const recipientInput = document.getElementById('recipient');
 const subjectInput = document.getElementById('subject');
 const bodyInput = document.getElementById('body');
 const characterCount = document.getElementById('characterCount');
@@ -21,7 +20,6 @@ form.addEventListener('submit', (event) => {
   const isValid = validateForm();
   if (!isValid) return;
 
-  document.getElementById('previewRecipient').textContent = recipientInput.value.trim();
   document.getElementById('previewSubject').textContent = subjectInput.value.trim();
   document.getElementById('previewBody').textContent = bodyInput.value.trim();
   reviewSection.classList.remove('hidden');
@@ -71,7 +69,6 @@ function validateForm() {
   clearErrors();
   let isValid = true;
   const fields = [
-    { input: recipientInput, error: 'recipientError', message: '宛先を入力してください。' },
     { input: subjectInput, error: 'subjectError', message: '件名を入力してください。' },
     { input: bodyInput, error: 'bodyError', message: '本文を入力してください。' }
   ];
@@ -110,19 +107,13 @@ function includesAny(text, patterns) {
 }
 
 function scoreEmail() {
-  const recipient = recipientInput.value.trim();
   const subject = subjectInput.value.trim();
   const body = bodyInput.value.trim();
-  const allText = `${recipient}\n${subject}\n${body}`;
+  const allText = `${subject}\n${body}`;
   const hasCandidates = ['9月19日', '9月21日', '9月22日'].filter((date) => body.includes(date)).length;
   const items = [
     {
-      title: '宛先が適切に記載されている', max: 10,
-      earned: recipient.includes('株式会社') && recipient.includes('様'),
-      good: '会社名と敬称が確認できました。', bad: '会社名と「様」などの敬称を入れてみましょう。'
-    },
-    {
-      title: '件名が具体的で、内容が分かる', max: 15,
+      title: '件名が具体的で、内容が分かる', max: 20,
       earned: subject.length >= 5 && includesAny(subject, ['日程', '打ち合わせ', '変更']),
       good: '用件が伝わる具体的な件名です。', bad: '「打ち合わせ」「日程」「変更」など、用件が分かる言葉を入れましょう。'
     },
@@ -132,7 +123,7 @@ function scoreEmail() {
       good: '丁寧な挨拶から始められています。', bad: '「お世話になっております」などの挨拶を入れましょう。'
     },
     {
-      title: '自分の所属・名前を名乗っている', max: 10,
+      title: '自分の所属・名前を名乗っている', max: 15,
       earned: (body.includes('株式会社ルミナス') || body.includes('ルミナス')) && includesAny(body, ['です', 'と申します']),
       good: '所属と名前を名乗れています。', bad: '会社名と自分の名前を名乗る一文を入れましょう。'
     },
@@ -158,7 +149,7 @@ function scoreEmail() {
     },
     {
       title: '結びの言葉が適切', max: 5,
-      earned: includesAny(body, ['よろしくお願いいたします', '幸いです', 'お知らせいただけますと']),
+      earned: includesAny(body, ['よろしく', '幸いです', 'お知らせいただけますと']),
       good: '丁寧な結びで締めくくれています。', bad: '最後に「よろしくお願いいたします」などの結びを入れましょう。'
     }
   ];
