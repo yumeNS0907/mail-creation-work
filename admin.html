@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>回答一覧 | メール作成ワーク</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand-mark" aria-hidden="true">L</div>
+      <div><p class="eyebrow">株式会社ルミナス</p><h1>研修回答一覧</h1></div>
+    </div>
+  </header>
+  <main class="admin-shell">
+    <div class="admin-heading">
+      <div><p class="section-kicker">ADMIN VIEW</p><h2>メール作成ワークの回答</h2></div>
+      <button class="secondary-button" id="reloadButton" type="button">再読み込み</button>
+    </div>
+    <p class="admin-note" id="adminStatus">回答を読み込んでいます。</p>
+    <div class="response-list" id="responseList"></div>
+  </main>
+  <script src="admin.js?v=1"></script>
+</body>
+</html>

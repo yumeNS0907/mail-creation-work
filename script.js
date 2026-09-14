@@ -1,5 +1,6 @@
 // メール作成ワークの画面操作と自動採点をまとめています。
 const form = document.getElementById('emailForm');
+const respondentNameInput = document.getElementById('respondentName');
 const subjectInput = document.getElementById('subject');
 const bodyInput = document.getElementById('body');
 const characterCount = document.getElementById('characterCount');
@@ -8,6 +9,9 @@ const composeSection = document.getElementById('composeSection');
 const reviewSection = document.getElementById('reviewSection');
 const resultsSection = document.getElementById('resultsSection');
 const progressSteps = document.querySelectorAll('.progress-step');
+
+// Google Apps ScriptのWebアプリURLを設定すると、提出内容がスプレッドシートへ保存されます。
+const SUBMISSION_ENDPOINT = '';
 
 // 入力中の本文文字数を更新します。
 bodyInput.addEventListener('input', () => {
@@ -48,6 +52,7 @@ document.getElementById('submitButton').addEventListener('click', () => {
   document.getElementById('feedbackList').innerHTML = missingItems.length > 0
     ? missingItems.map((item) => `<li><strong>${item.title}</strong><span>あと${item.max - item.points}点分：${item.gap}</span></li>`).join('')
     : '<li class="feedback-complete">すべての評価項目を満たしています。今回の学びを次のメール作成にも活かしましょう。</li>';
+  saveSubmission(result.total);
   reviewSection.classList.add('hidden');
   resultsSection.classList.remove('hidden');
   setStep(4);
@@ -73,6 +78,7 @@ function validateForm() {
   clearErrors();
   let isValid = true;
   const fields = [
+    { input: respondentNameInput, error: 'respondentNameError', message: '回答者名を入力してください。' },
     { input: subjectInput, error: 'subjectError', message: '件名を入力してください。' },
     { input: bodyInput, error: 'bodyError', message: '本文を入力してください。' }
   ];
@@ -90,6 +96,27 @@ function validateForm() {
     firstInvalid.focus();
   }
   return isValid;
+}
+
+// 設定済みのGoogle Apps Scriptへ提出内容を送信します。
+function saveSubmission(score) {
+  if (!SUBMISSION_ENDPOINT) return;
+  const payload = {
+    name: respondentNameInput.value.trim(),
+    subject: subjectInput.value.trim(),
+    body: bodyInput.value.trim(),
+    score
+  };
+  fetch(SUBMISSION_ENDPOINT, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  }).then(() => {
+    document.getElementById('saveStatus').textContent = '提出内容を保存しました。これは研修上の提出で、実際のメールは送信されていません。';
+  }).catch(() => {
+    document.getElementById('saveStatus').textContent = '採点は完了しましたが、保存に失敗しました。担当者へお知らせください。';
+  });
 }
 
 function clearErrors() {

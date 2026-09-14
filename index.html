@@ -71,6 +71,11 @@
       <p class="section-note">相手に伝わりやすく、丁寧な文章を自由に考えてみましょう。</p>
       <form id="emailForm" novalidate>
         <div class="field-group">
+          <label for="respondentName">回答者名 <span class="required">必須</span></label>
+          <input id="respondentName" type="text" autocomplete="name" placeholder="氏名を入力してください">
+          <p class="field-error" id="respondentNameError"></p>
+        </div>
+        <div class="field-group">
           <label for="subject">件名 <span class="required">必須</span></label>
           <input id="subject" type="text" placeholder="打ち合わせ日程変更のお願い">
           <p class="field-error" id="subjectError"></p>
@@ -111,7 +116,7 @@
     <section class="results-section hidden" id="resultsSection" aria-live="polite">
       <div class="completion-banner">
         <span class="completion-icon" aria-hidden="true">✓</span>
-        <div><p class="section-kicker">SUBMITTED</p><h2>メール作成お疲れさまでした！</h2><p>これは研修上の提出です。実際のメールは送信されていません。</p></div>
+        <div><p class="section-kicker">SUBMITTED</p><h2>メール作成お疲れさまでした！</h2><p id="saveStatus">これは研修上の提出です。実際のメールは送信されていません。</p></div>
       </div>
 
       <div class="score-card">
@@ -148,6 +153,6 @@
   </main>
 
   <footer class="site-footer">株式会社ルミナス ｜ 新卒社員研修</footer>
-  <script src="script.js?v=3"></script>
+  <script src="script.js?v=4"></script>
 </body>
 </html>
