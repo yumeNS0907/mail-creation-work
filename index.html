@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#166b68">
+  <title>メール作成ワーク | 株式会社ルミナス</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand-mark" aria-hidden="true">L</div>
+      <div>
+        <p class="eyebrow">株式会社ルミナス</p>
+        <h1>メール作成ワーク</h1>
+      </div>
+      <button class="reset-button" id="resetButton" type="button">最初からやり直す</button>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <nav class="progress-nav" aria-label="進行状況">
+      <div class="progress-step active" data-step="1"><span>01</span><b>問題確認</b></div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-step="2"><span>02</span><b>メール作成</b></div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-step="3"><span>03</span><b>確認</b></div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-step="4"><span>04</span><b>振り返り</b></div>
+    </nav>
+
+    <section class="intro-block" id="problemSection">
+      <div class="section-heading">
+        <span class="section-number">01</span>
+        <div>
+          <p class="section-kicker">SCENARIO</p>
+          <h2>打ち合わせの日程を変更しよう</h2>
+        </div>
+      </div>
+      <div class="scenario-card">
+        <div class="scenario-lead"><span class="status-dot"></span>営業部の新入社員として挑戦</div>
+        <p>あなたは営業部の新入社員です。</p>
+        <p>取引先である「株式会社〇〇」と、<strong>9月18日（金）14:00からオンライン</strong>で打ち合わせを予定していました。</p>
+        <p>しかし、社内の都合により、予定していた日時での打ち合わせが難しくなってしまいました。</p>
+        <p>取引先へ日程変更をお願いするメールを作成してください。</p>
+        <div class="detail-grid">
+          <div class="detail-panel">
+            <span class="detail-label">変更前</span>
+            <p>9月18日（金）14:00～</p>
+            <p>オンライン</p>
+          </div>
+          <div class="detail-panel candidate-panel">
+            <span class="detail-label">候補日時</span>
+            <p>9月19日（土）10:00～</p>
+            <p>9月21日（月）13:00～</p>
+            <p>9月22日（火）15:00～</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="compose-section" id="composeSection">
+      <div class="section-heading">
+        <span class="section-number">02</span>
+        <div>
+          <p class="section-kicker">WRITE YOUR EMAIL</p>
+          <h2>メールを作成してください</h2>
+        </div>
+      </div>
+      <p class="section-note">相手に伝わりやすく、丁寧な文章を自由に考えてみましょう。</p>
+      <form id="emailForm" novalidate>
+        <div class="field-group">
+          <label for="recipient">宛先 <span class="required">必須</span></label>
+          <textarea id="recipient" rows="2" placeholder="株式会社〇〇&#10;〇〇様"></textarea>
+          <p class="field-error" id="recipientError"></p>
+        </div>
+        <div class="field-group">
+          <label for="subject">件名 <span class="required">必須</span></label>
+          <input id="subject" type="text" placeholder="打ち合わせ日程変更のお願い">
+          <p class="field-error" id="subjectError"></p>
+        </div>
+        <div class="field-group">
+          <div class="label-row">
+            <label for="body">本文 <span class="required">必須</span></label>
+            <span class="character-count" id="characterCount">0文字</span>
+          </div>
+          <textarea id="body" class="body-input" placeholder="例：お世話になっております。株式会社ルミナスの〇〇です。"></textarea>
+          <p class="field-error" id="bodyError"></p>
+        </div>
+        <button class="primary-button full-button" type="submit">入力内容を確認する <span aria-hidden="true">→</span></button>
+      </form>
+    </section>
+
+    <section class="review-section hidden" id="reviewSection" aria-live="polite">
+      <div class="section-heading">
+        <span class="section-number">03</span>
+        <div>
+          <p class="section-kicker">CHECK YOUR EMAIL</p>
+          <h2>入力内容を確認</h2>
+        </div>
+      </div>
+      <div class="mail-preview">
+        <div class="mail-toolbar"><span class="mail-dot"></span><span class="mail-dot"></span><span class="mail-dot"></span><span class="mail-label">メールプレビュー</span></div>
+        <dl class="mail-meta">
+          <div><dt>宛先</dt><dd id="previewRecipient"></dd></div>
+          <div><dt>件名</dt><dd id="previewSubject"></dd></div>
+        </dl>
+        <div class="mail-body" id="previewBody"></div>
+      </div>
+      <div class="button-stack">
+        <button class="primary-button full-button" id="submitButton" type="button">この内容で提出する <span aria-hidden="true">→</span></button>
+        <button class="secondary-button full-button" id="editButton" type="button">修正する</button>
+      </div>
+    </section>
+
+    <section class="results-section hidden" id="resultsSection" aria-live="polite">
+      <div class="completion-banner">
+        <span class="completion-icon" aria-hidden="true">✓</span>
+        <div><p class="section-kicker">SUBMITTED</p><h2>メール作成お疲れさまでした！</h2><p>これは研修上の提出です。実際のメールは送信されていません。</p></div>
+      </div>
+
+      <div class="score-card">
+        <div class="score-heading"><div><p class="section-kicker">YOUR SCORE</p><h2>あなたのメールをチェックしてみましょう</h2></div><div class="score-circle"><strong id="totalScore">0</strong><span>/ 100</span></div></div>
+        <div class="score-list" id="scoreList"></div>
+      </div>
+
+      <div class="model-answer">
+        <div class="section-heading compact-heading"><span class="section-number">MODEL</span><div><p class="section-kicker">REFERENCE</p><h2>模範回答</h2></div></div>
+        <div class="answer-card">
+          <div class="answer-row"><b>宛先：</b><span>株式会社〇〇<br>〇〇様</span></div>
+          <div class="answer-row"><b>件名：</b><span>打ち合わせ日程変更のお願い</span></div>
+          <div class="answer-row answer-body"><b>本文：</b><div>お世話になっております。<br>株式会社ルミナスの〇〇です。<br><br>9月18日（金）14:00より予定しておりますお打ち合わせについて、ご相談がありご連絡いたしました。<br><br>大変恐縮ではございますが、社内の都合により、予定しておりました日時でのお打ち合わせが難しくなってしまいました。<br><br>つきましては、下記のいずれかの日程へ変更させていただくことは可能でしょうか。<br><br>・9月19日（土）10:00～<br>・9月21日（月）13:00～<br>・9月22日（火）15:00～<br><br>お手数をおかけしてしまい、申し訳ございません。<br><br>ご都合のよい日時がございましたら、お知らせいただけますと幸いです。<br><br>何卒よろしくお願いいたします。<br><br>株式会社ルミナス<br>〇〇 〇〇</div></div>
+        </div>
+      </div>
+
+      <div class="tips-section">
+        <div class="section-heading compact-heading"><span class="section-number">TIPS</span><div><p class="section-kicker">LEARNING POINTS</p><h2>ポイント解説</h2></div></div>
+        <div class="tips-list">
+          <article><span>01</span><div><h3>件名だけで目的を伝える</h3><p>「日程変更のお願い」のように、件名を見ただけでメールの用件が分かるようにします。</p></div></article>
+          <article><span>02</span><div><h3>最初に挨拶と名前を伝える</h3><p>挨拶に続けて会社名と名前を名乗ると、誰からのメールかすぐに伝わります。</p></div></article>
+          <article><span>03</span><div><h3>変更内容は具体的に書く</h3><p>変更したい打ち合わせの日時や方法を示し、相手が状況を正しく理解できるようにします。</p></div></article>
+          <article><span>04</span><div><h3>候補日時を複数提示する</h3><p>相手が選びやすいよう、こちらから複数の候補を提示します。</p></div></article>
+          <article><span>05</span><div><h3>相手への配慮を入れる</h3><p>お詫びや「お手数をおかけします」などの表現で、相手の負担への配慮を伝えます。</p></div></article>
+          <article><span>06</span><div><h3>丁寧な結びで終える</h3><p>「何卒よろしくお願いいたします」などで、最後まで丁寧な印象に整えます。</p></div></article>
+        </div>
+      </div>
+      <button class="secondary-button full-button restart-button" id="restartButton" type="button">もう一度練習する</button>
+    </section>
+  </main>
+
+  <footer class="site-footer">株式会社ルミナス ｜ 新卒社員研修</footer>
+  <script src="script.js"></script>
+</body>
+</html>
