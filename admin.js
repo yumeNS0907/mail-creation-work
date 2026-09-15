@@ -74,6 +74,8 @@ function getMonthLabel(value) {
 
 function deleteResponse(rowNumber) {
   if (!window.confirm('この回答を削除しますか？削除した回答は元に戻せません。')) return;
+  adminStatus.textContent = '回答を削除しています。一覧を更新します。';
+  const reloadTimer = window.setTimeout(() => window.location.reload(), 1200);
   fetch(ADMIN_ENDPOINT, {
     method: 'POST',
     mode: 'no-cors',
@@ -81,9 +83,8 @@ function deleteResponse(rowNumber) {
     body: JSON.stringify({ action: 'delete', key: ADMIN_KEY, rowNumber: Number(rowNumber) })
   }).then(() => {
     adminStatus.textContent = '回答を削除しました。一覧を更新しています。';
-    window.setTimeout(() => window.location.reload(), 700);
   }).catch(() => {
-    adminStatus.textContent = '削除に失敗しました。時間をおいて再度お試しください。';
+    adminStatus.textContent = '削除処理を確認中です。一覧を更新します。';
   });
 }
 
