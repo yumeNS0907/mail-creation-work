@@ -4,13 +4,23 @@
 .admin-heading .secondary-button { width: auto; min-height: 44px; padding: 8px 13px; white-space: nowrap; }
 .admin-note { margin: 0 0 18px; color: var(--muted); font-size: 13px; }
 .response-list { display: grid; gap: 12px; }
+.month-folder { overflow: hidden; background: var(--pale); border: 1px solid var(--line); border-radius: 12px; }
+.month-folder summary { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; color: var(--teal); cursor: pointer; font-weight: 700; list-style: none; }
+.month-folder summary::-webkit-details-marker { display: none; }
+.month-folder summary::before { content: '▸'; margin-right: 8px; color: var(--coral); }
+.month-folder[open] summary::before { content: '▾'; }
+.month-folder summary b { color: var(--muted); font-size: 12px; }
+.month-responses { display: grid; gap: 10px; padding: 0 10px 10px; }
 .response-card { padding: 17px; background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
 .response-card-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
 .response-card h3 { margin: 0; font-size: 16px; }
 .response-date { color: var(--muted); font-size: 11px; white-space: nowrap; }
+.response-card-actions { display: flex; align-items: flex-end; flex-direction: column; gap: 6px; }
+.delete-button { padding: 4px 7px; color: #b44d3d; background: #fff; border: 1px solid #e8b2a6; border-radius: 5px; font-size: 11px; }
+.delete-button:hover { color: #fff; background: #c45c4a; }
 .response-score { display: inline-block; margin-top: 4px; color: var(--teal); font-size: 13px; font-weight: 700; }
 .response-field { padding-top: 11px; }
 .response-label { display: block; margin-bottom: 2px; color: var(--muted); font-size: 11px; font-weight: 700; }
 .response-value { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.7; }
 .empty-state { padding: 28px 18px; color: var(--muted); background: #fff; border: 1px dashed var(--line); border-radius: 12px; text-align: center; }
-@media (max-width: 480px) { .admin-heading { align-items: flex-start; flex-direction: column; } .admin-heading .secondary-button { width: 100%; } .response-card-head { flex-direction: column; gap: 3px; } }
+@media (max-width: 480px) { .admin-heading { align-items: flex-start; flex-direction: column; } .admin-heading .secondary-button { width: 100%; } .response-card-head { flex-direction: column; gap: 9px; } .response-card-actions { align-items: flex-start; } }

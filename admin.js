@@ -37,16 +37,54 @@ function renderResponses(responses) {
     responseList.innerHTML = '<p class="empty-state">まだ回答はありません。</p>';
     return;
   }
-  responseList.innerHTML = responses.map((response) => `
+  const monthlyGroups = responses.reduce((groups, response) => {
+    const month = getMonthLabel(response.submittedAt);
+    if (!groups[month]) groups[month] = [];
+    groups[month].push(response);
+    return groups;
+  }, {});
+  responseList.innerHTML = Object.entries(monthlyGroups).map(([month, monthResponses]) => `
+    <details class="month-folder" open>
+      <summary><span>${month}</span><b>${monthResponses.length}件</b></summary>
+      <div class="month-responses">${monthResponses.map(renderResponseCard).join('')}</div>
+    </details>
+  `).join('');
+  document.querySelectorAll('.delete-button').forEach((button) => {
+    button.addEventListener('click', () => deleteResponse(button.dataset.rowNumber));
+  });
+}
+
+function renderResponseCard(response) {
+  return `
     <article class="response-card">
       <div class="response-card-head">
         <div><h3>${escapeHtml(response.name)}</h3><span class="response-score">${escapeHtml(response.score)} / 100点</span></div>
-        <time class="response-date">${formatDate(response.submittedAt)}</time>
+        <div class="response-card-actions"><time class="response-date">${formatDate(response.submittedAt)}</time><button class="delete-button" type="button" data-row-number="${escapeHtml(response.rowNumber)}">この回答を削除</button></div>
       </div>
       <div class="response-field"><span class="response-label">件名</span><p class="response-value">${escapeHtml(response.subject)}</p></div>
       <div class="response-field"><span class="response-label">本文</span><p class="response-value">${escapeHtml(response.body)}</p></div>
     </article>
-  `).join('');
+  `;
+}
+
+function getMonthLabel(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '日時不明' : `${date.getFullYear()}年${date.getMonth() + 1}月`;
+}
+
+function deleteResponse(rowNumber) {
+  if (!window.confirm('この回答を削除しますか？削除した回答は元に戻せません。')) return;
+  fetch(ADMIN_ENDPOINT, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: 'delete', key: ADMIN_KEY, rowNumber: Number(rowNumber) })
+  }).then(() => {
+    adminStatus.textContent = '回答を削除しました。';
+    loadResponses();
+  }).catch(() => {
+    adminStatus.textContent = '削除に失敗しました。時間をおいて再度お試しください。';
+  });
 }
 
 function formatDate(value) {

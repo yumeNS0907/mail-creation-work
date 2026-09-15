@@ -9,8 +9,22 @@ function getResponseSheet() {
 }
 
 function doPost(event) {
-  const sheet = getResponseSheet();
   const data = JSON.parse(event.postData.contents || '{}');
+
+  if (data.action === 'delete') {
+    if (data.key !== ADMIN_KEY || !Number.isInteger(Number(data.rowNumber))) {
+      return ContentService.createTextOutput('unauthorized');
+    }
+    const sheet = getResponseSheet();
+    const rowNumber = Number(data.rowNumber);
+    if (rowNumber < 2 || rowNumber > sheet.getLastRow()) {
+      return ContentService.createTextOutput('invalid row');
+    }
+    sheet.deleteRow(rowNumber);
+    return ContentService.createTextOutput('deleted');
+  }
+
+  const sheet = getResponseSheet();
 
   if (!data.name || !data.subject || !data.body) {
     return ContentService.createTextOutput('missing required fields');
@@ -33,13 +47,14 @@ function doGet(event) {
 
   const sheet = getResponseSheet();
   const rows = sheet ? sheet.getDataRange().getValues() : [];
-  const responses = rows.slice(1).reverse().map((row) => ({
+  const responses = rows.slice(1).map((row, index) => ({
+    rowNumber: index + 2,
     submittedAt: row[0],
     name: row[1],
     subject: row[2],
     body: row[3],
     score: row[4]
-  }));
+  })).reverse();
   return ContentService.createTextOutput(`${callback}(${JSON.stringify({ responses })});`)
     .setMimeType(ContentService.MimeType.JAVASCRIPT);
 }
