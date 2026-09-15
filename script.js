@@ -157,9 +157,10 @@ function scoreEmail() {
   const normalizedBody = normalizeText(body);
   const normalizedAllText = `${normalizedSubject}\n${normalizedBody}`;
   const greetingPatterns = ['お世話になっております', 'いつもお世話になっております', '平素よりお世話になっております', '日頃よりお世話になっております', 'お疲れさまです', 'お疲れ様です'];
-  const meetingPatterns = ['打ち合わせ', '打合せ', '打ち合せ', '商談', '会議', 'ミーティング', '面談', 'お打ち合わせ'];
-  const changePatterns = ['日程変更', '日時変更', '日程の変更', '日程を変更', '日時を変更', '変更', '延期', '再調整', '別日', '日程調整'];
-  const requestPatterns = ['お願い', '可能でしょうか', '可能ですか', 'いただけますでしょうか', 'いただけますか', 'お願いできますか', 'ご相談', 'ご都合', 'ご検討'];
+  const meetingPatterns = ['打ち合わせ', '打合せ', '打ち合せ', '商談', '会議', 'ミーティング', '面談', 'お打ち合わせ', 'アポイント', '訪問', '面接'];
+  const changePatterns = ['日程変更', '日時変更', '日程の変更', '日程を変更', '日時を変更', 'スケジュール変更', '日程調整', '日程を調整', '変更', '延期', '再調整', '別日', '日程変更'];
+  const requestPatterns = ['お願い', '可能でしょうか', '可能ですか', 'いただけますでしょうか', 'いただけますか', 'お願いできますか', 'ご相談', 'ご都合', 'ご検討', 'ご連絡'];
+  const subjectContextPatterns = ['について', 'に関する', 'の件', 'のご相談', 'のご連絡', 'のお願い', '候補', '日程調整'];
   const hasGreeting = includesAny(body, greetingPatterns);
   const greetingIndex = greetingPatterns.reduce((firstIndex, pattern) => {
     const index = body.indexOf(pattern);
@@ -170,15 +171,17 @@ function scoreEmail() {
   const candidateDateCount = candidateDatePatterns.filter((patterns) => includesAny(normalizedBody, patterns)).length;
   const candidateTimePatterns = [['10:00', '10時', '午前10時'], ['13:00', '13時', '午後1時'], ['15:00', '15時', '午後3時']];
   const candidateTimeCount = candidateTimePatterns.filter((patterns) => includesAny(normalizedBody, patterns)).length;
-  const subjectHasPurpose = normalizedSubject.length >= 5
+  const hasSubjectContext = includesAny(normalizedSubject, subjectContextPatterns);
+  const subjectHasPurpose = normalizedSubject.length >= 8
     && includesAny(normalizedSubject, meetingPatterns)
     && includesAny(normalizedSubject, changePatterns)
-    && includesAny(normalizedSubject, requestPatterns);
+    && (includesAny(normalizedSubject, requestPatterns) || hasSubjectContext || normalizedSubject.length >= 12);
   const subjectPoints = subjectHasPurpose ? 20 : Math.min(20,
     (subject.length >= 5 ? 3 : subject.length >= 3 ? 1 : 0)
       + (includesAny(normalizedSubject, meetingPatterns) ? 5 : 0)
       + (includesAny(normalizedSubject, changePatterns) ? 6 : 0)
       + (includesAny(normalizedSubject, requestPatterns) ? 4 : 0)
+      + (hasSubjectContext ? 4 : 0)
       + (/[0-9０-９]+月|[0-9０-９]+時/.test(subject) ? 2 : 0));
   const greetingPoints = (greetingAtStart ? 6 : hasGreeting ? 4 : 0)
     + (hasGreeting && includesAny(body, ['おります', 'です']) ? 4 : 0);
