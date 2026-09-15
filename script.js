@@ -155,7 +155,7 @@ function scoreEmail() {
   const requestPatterns = ['お願い', '可能でしょうか', 'いただけますでしょうか', 'ご相談', 'ご都合'];
   const hasGreeting = includesAny(body, greetingPatterns);
   const greetingAtStart = greetingPatterns.some((pattern) => body.startsWith(pattern));
-  const candidateDates = ['9月19日', '9月21日', '9月22日'];
+  const candidateDates = ['9月21日', '9月22日', '9月23日'];
   const candidateDateCount = candidateDates.filter((date) => body.includes(date)).length;
   const candidateTimeCount = ['10:00', '13:00', '15:00'].filter((time) => body.includes(time)).length;
   const subjectPoints = Math.min(20,
