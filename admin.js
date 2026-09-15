@@ -59,7 +59,7 @@ function renderResponseCard(response) {
     <article class="response-card">
       <div class="response-card-head">
         <div><h3>${escapeHtml(response.name)}</h3><span class="response-score">${escapeHtml(response.score)} / 100点</span></div>
-        <div class="response-card-actions"><time class="response-date">${formatDate(response.submittedAt)}</time><button class="delete-button" type="button" data-row-number="${escapeHtml(response.rowNumber)}" aria-label="${escapeHtml(response.name)}さんの回答を削除"><span aria-hidden="true">×</span>削除</button></div>
+        <div class="response-card-actions"><time class="response-date">${formatDate(response.submittedAt)}</time><button class="delete-button" type="button" data-row-number="${escapeHtml(response.rowNumber)}" aria-label="${escapeHtml(response.name)}さんの回答を削除">この回答を削除</button></div>
       </div>
       <div class="response-field"><span class="response-label">件名</span><p class="response-value">${escapeHtml(response.subject)}</p></div>
       <div class="response-field"><span class="response-label">本文</span><p class="response-value">${escapeHtml(response.body)}</p></div>
