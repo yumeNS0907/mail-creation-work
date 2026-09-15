@@ -154,11 +154,19 @@ function scoreEmail() {
   const changePatterns = ['日程変更', '日時変更', '日程の変更', '変更', '延期', '再調整', '別日'];
   const requestPatterns = ['お願い', '可能でしょうか', 'いただけますでしょうか', 'ご相談', 'ご都合'];
   const hasGreeting = includesAny(body, greetingPatterns);
-  const greetingAtStart = greetingPatterns.some((pattern) => body.startsWith(pattern));
+  const greetingIndex = greetingPatterns.reduce((firstIndex, pattern) => {
+    const index = body.indexOf(pattern);
+    return index >= 0 && (firstIndex < 0 || index < firstIndex) ? index : firstIndex;
+  }, -1);
+  const greetingAtStart = greetingIndex >= 0 && body.slice(0, greetingIndex).trim().length <= 80;
   const candidateDates = ['9月21日', '9月22日', '9月23日'];
   const candidateDateCount = candidateDates.filter((date) => body.includes(date)).length;
   const candidateTimeCount = ['10:00', '13:00', '15:00'].filter((time) => body.includes(time)).length;
-  const subjectPoints = Math.min(20,
+  const subjectHasPurpose = subject.length >= 5
+    && includesAny(subject, meetingPatterns)
+    && includesAny(subject, changePatterns)
+    && includesAny(subject, requestPatterns);
+  const subjectPoints = subjectHasPurpose ? 20 : Math.min(20,
     (subject.length >= 5 ? 3 : subject.length >= 3 ? 1 : 0)
       + (includesAny(subject, meetingPatterns) ? 5 : 0)
       + (includesAny(subject, changePatterns) ? 6 : 0)
@@ -184,7 +192,7 @@ function scoreEmail() {
     + (includesAny(body, ['社内の都合', '難しくなって', '急なお願い', '勝手を申し']) ? 3 : 0);
   const closingPoints = (body.includes('よろしく') ? 3 : 0)
     + (includesAny(body, ['幸いです', 'お知らせいただけますと', 'ご連絡ください']) ? 1 : 0)
-    + (/(よろしく|幸いです|ご連絡ください)[。！!]?\s*$/.test(body) ? 1 : 0);
+    + (/(よろしくお願いいたします|よろしくお願いします|幸いです|ご連絡ください)[。！!]?\s*$/.test(body) ? 1 : 0);
   const items = [
     makeScoreItem('件名が具体的で、内容が分かる', 20, subjectPoints, '用件を示す要素を複数含んだ件名です。', '件名に打ち合わせ・日程変更・お願いなど、用件が分かる要素を入れましょう。'),
     makeScoreItem('適切な挨拶がある', 10, Math.min(10, greetingPoints), '丁寧な挨拶を適切な位置に入れられています。', '本文の冒頭に「お世話になっております」などの挨拶を入れましょう。'),
