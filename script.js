@@ -141,6 +141,10 @@ function countMatches(text, patterns) {
   return patterns.filter((pattern) => text.includes(pattern)).length;
 }
 
+function normalizeText(text) {
+  return text.replace(/[０-９：]/g, (character) => String.fromCharCode(character.charCodeAt(0) - 0xfee0)).replace(/：/g, ':');
+}
+
 function makeScoreItem(title, max, points, good, bad) {
   return { title, max, points, comment: points > 0 ? good : bad, gap: bad };
 }
@@ -149,28 +153,32 @@ function scoreEmail() {
   const subject = subjectInput.value.trim();
   const body = bodyInput.value.trim();
   const allText = `${subject}\n${body}`;
-  const greetingPatterns = ['お世話になっております', 'いつもお世話になっております', 'お疲れさまです', 'お疲れ様です'];
-  const meetingPatterns = ['打ち合わせ', '打合せ', '商談', '会議', 'ミーティング', '面談'];
-  const changePatterns = ['日程変更', '日時変更', '日程の変更', '変更', '延期', '再調整', '別日'];
-  const requestPatterns = ['お願い', '可能でしょうか', 'いただけますでしょうか', 'ご相談', 'ご都合'];
+  const normalizedSubject = normalizeText(subject);
+  const normalizedBody = normalizeText(body);
+  const normalizedAllText = `${normalizedSubject}\n${normalizedBody}`;
+  const greetingPatterns = ['お世話になっております', 'いつもお世話になっております', '平素よりお世話になっております', '日頃よりお世話になっております', 'お疲れさまです', 'お疲れ様です'];
+  const meetingPatterns = ['打ち合わせ', '打合せ', '打ち合せ', '商談', '会議', 'ミーティング', '面談', 'お打ち合わせ'];
+  const changePatterns = ['日程変更', '日時変更', '日程の変更', '日程を変更', '日時を変更', '変更', '延期', '再調整', '別日', '日程調整'];
+  const requestPatterns = ['お願い', '可能でしょうか', '可能ですか', 'いただけますでしょうか', 'いただけますか', 'お願いできますか', 'ご相談', 'ご都合', 'ご検討'];
   const hasGreeting = includesAny(body, greetingPatterns);
   const greetingIndex = greetingPatterns.reduce((firstIndex, pattern) => {
     const index = body.indexOf(pattern);
     return index >= 0 && (firstIndex < 0 || index < firstIndex) ? index : firstIndex;
   }, -1);
   const greetingAtStart = greetingIndex >= 0 && body.slice(0, greetingIndex).trim().length <= 80;
-  const candidateDates = ['9月21日', '9月22日', '9月23日'];
-  const candidateDateCount = candidateDates.filter((date) => body.includes(date)).length;
-  const candidateTimeCount = ['10:00', '13:00', '15:00'].filter((time) => body.includes(time)).length;
-  const subjectHasPurpose = subject.length >= 5
-    && includesAny(subject, meetingPatterns)
-    && includesAny(subject, changePatterns)
-    && includesAny(subject, requestPatterns);
+  const candidateDatePatterns = [['9月21日', '9/21', '9月21'], ['9月22日', '9/22', '9月22'], ['9月23日', '9/23', '9月23']];
+  const candidateDateCount = candidateDatePatterns.filter((patterns) => includesAny(normalizedBody, patterns)).length;
+  const candidateTimePatterns = [['10:00', '10時', '午前10時'], ['13:00', '13時', '午後1時'], ['15:00', '15時', '午後3時']];
+  const candidateTimeCount = candidateTimePatterns.filter((patterns) => includesAny(normalizedBody, patterns)).length;
+  const subjectHasPurpose = normalizedSubject.length >= 5
+    && includesAny(normalizedSubject, meetingPatterns)
+    && includesAny(normalizedSubject, changePatterns)
+    && includesAny(normalizedSubject, requestPatterns);
   const subjectPoints = subjectHasPurpose ? 20 : Math.min(20,
     (subject.length >= 5 ? 3 : subject.length >= 3 ? 1 : 0)
-      + (includesAny(subject, meetingPatterns) ? 5 : 0)
-      + (includesAny(subject, changePatterns) ? 6 : 0)
-      + (includesAny(subject, requestPatterns) ? 4 : 0)
+      + (includesAny(normalizedSubject, meetingPatterns) ? 5 : 0)
+      + (includesAny(normalizedSubject, changePatterns) ? 6 : 0)
+      + (includesAny(normalizedSubject, requestPatterns) ? 4 : 0)
       + (/[0-9０-９]+月|[0-9０-９]+時/.test(subject) ? 2 : 0));
   const greetingPoints = (greetingAtStart ? 6 : hasGreeting ? 4 : 0)
     + (hasGreeting && includesAny(body, ['おります', 'です']) ? 4 : 0);
@@ -178,18 +186,18 @@ function scoreEmail() {
   const nameIntroduced = includesAny(body, ['〇〇です', '○○です', 'です。', 'と申します', '申します。']);
   const affiliationPoints = (companyMentioned ? 6 : 0) + (nameIntroduced ? 5 : 0)
     + (companyMentioned && nameIntroduced ? 4 : 0);
-  const changeIntentPoints = (includesAny(allText, changePatterns) ? 5 : 0)
-    + (includesAny(body, ['社内の都合', '都合により', '難しく', '予定して', 'できなく']) ? 3 : 0)
-    + (includesAny(body, requestPatterns) ? 4 : 0)
-    + (includesAny(body, ['変更させて', '変更したく', '変更をお願い', '延期させて']) ? 3 : 0);
-  const oldDatePoints = (body.includes('9月18日') ? 4 : 0)
-    + (includesAny(body, ['金曜', '金）', '金曜日']) ? 2 : 0)
-    + (body.includes('14:00') || body.includes('14時') ? 3 : 0)
-    + (includesAny(body, ['予定', '変更前', '打ち合わせ']) ? 1 : 0);
-  const candidatePoints = Math.min(15, candidateDateCount * 3 + candidateTimeCount + (candidateDateCount >= 1 && includesAny(body, requestPatterns) ? 3 : 0));
-  const considerationPoints = (includesAny(body, ['申し訳', '恐縮', 'お詫び', 'おわび']) ? 4 : 0)
-    + (includesAny(body, ['お手数', 'ご迷惑', 'ご負担', '恐れ入ります']) ? 3 : 0)
-    + (includesAny(body, ['社内の都合', '難しくなって', '急なお願い', '勝手を申し']) ? 3 : 0);
+  const changeIntentPoints = (includesAny(normalizedAllText, changePatterns) ? 5 : 0)
+    + (includesAny(normalizedBody, ['社内の都合', '都合により', '難しく', '予定して', 'できなく', '都合がつかず', '都合が悪く']) ? 3 : 0)
+    + (includesAny(normalizedBody, requestPatterns) ? 4 : 0)
+    + (includesAny(normalizedBody, ['変更させて', '変更したく', '変更をお願い', '延期させて', '調整させて', '変更いただけ']) ? 3 : 0);
+  const oldDatePoints = (includesAny(normalizedBody, ['9月18日', '9/18', '9月18']) ? 4 : 0)
+    + (includesAny(normalizedBody, ['金曜', '金）', '金曜日']) ? 2 : 0)
+    + (includesAny(normalizedBody, ['14:00', '14時', '午後2時']) ? 3 : 0)
+    + (includesAny(normalizedBody, ['予定', '変更前', '打ち合わせ']) ? 1 : 0);
+  const candidatePoints = Math.min(15, candidateDateCount * 3 + candidateTimeCount + (candidateDateCount >= 1 && includesAny(normalizedBody, requestPatterns) ? 3 : 0));
+  const considerationPoints = (includesAny(normalizedBody, ['申し訳', '恐縮', 'お詫び', 'おわび', '心苦しい']) ? 4 : 0)
+    + (includesAny(normalizedBody, ['お手数', 'ご迷惑', 'ご負担', '恐れ入ります', 'ご面倒', 'ご容赦']) ? 3 : 0)
+    + (includesAny(normalizedBody, ['社内の都合', '難しくなって', '急なお願い', '勝手を申し', 'ご理解']) ? 3 : 0);
   const closingPoints = (body.includes('よろしく') ? 3 : 0)
     + (includesAny(body, ['幸いです', 'お知らせいただけますと', 'ご連絡ください']) ? 1 : 0)
     + (/(よろしくお願いいたします|よろしくお願いします|幸いです|ご連絡ください)[。！!]?\s*$/.test(body) ? 1 : 0);
