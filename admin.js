@@ -59,7 +59,7 @@ function renderResponseCard(response) {
     <article class="response-card">
       <div class="response-card-head">
         <div><h3>${escapeHtml(response.name)}</h3><span class="response-score">${escapeHtml(response.score)} / 100点</span></div>
-        <div class="response-card-actions"><time class="response-date">${formatDate(response.submittedAt)}</time><button class="delete-button" type="button" data-row-number="${escapeHtml(response.rowNumber)}">この回答を削除</button></div>
+        <div class="response-card-actions"><time class="response-date">${formatDate(response.submittedAt)}</time><button class="delete-button" type="button" data-row-number="${escapeHtml(response.rowNumber)}" aria-label="${escapeHtml(response.name)}さんの回答を削除"><span aria-hidden="true">×</span>削除</button></div>
       </div>
       <div class="response-field"><span class="response-label">件名</span><p class="response-value">${escapeHtml(response.subject)}</p></div>
       <div class="response-field"><span class="response-label">本文</span><p class="response-value">${escapeHtml(response.body)}</p></div>
@@ -80,8 +80,8 @@ function deleteResponse(rowNumber) {
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify({ action: 'delete', key: ADMIN_KEY, rowNumber: Number(rowNumber) })
   }).then(() => {
-    adminStatus.textContent = '回答を削除しました。';
-    loadResponses();
+    adminStatus.textContent = '回答を削除しました。一覧を更新しています。';
+    window.setTimeout(() => window.location.reload(), 700);
   }).catch(() => {
     adminStatus.textContent = '削除に失敗しました。時間をおいて再度お試しください。';
   });

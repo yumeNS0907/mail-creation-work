@@ -16,8 +16,10 @@
 .response-card h3 { margin: 0; font-size: 16px; }
 .response-date { color: var(--muted); font-size: 11px; white-space: nowrap; }
 .response-card-actions { display: flex; align-items: flex-end; flex-direction: column; gap: 6px; }
-.delete-button { padding: 4px 7px; color: #b44d3d; background: #fff; border: 1px solid #e8b2a6; border-radius: 5px; font-size: 11px; }
-.delete-button:hover { color: #fff; background: #c45c4a; }
+.delete-button { display: inline-flex; align-items: center; gap: 4px; padding: 5px 9px; color: #a65345; background: #fff8f6; border: 1px solid #e3b0a5; border-radius: 7px; box-shadow: 0 2px 5px rgba(176, 83, 67, .08); font-size: 11px; font-weight: 700; transition: color .15s, background .15s, border-color .15s, transform .15s; }
+.delete-button span { font-size: 15px; line-height: 11px; }
+.delete-button:hover { color: #fff; background: var(--coral); border-color: var(--coral); }
+.delete-button:active { transform: translateY(1px); }
 .response-score { display: inline-block; margin-top: 4px; color: var(--teal); font-size: 13px; font-weight: 700; }
 .response-field { padding-top: 11px; }
 .response-label { display: block; margin-bottom: 2px; color: var(--muted); font-size: 11px; font-weight: 700; }
